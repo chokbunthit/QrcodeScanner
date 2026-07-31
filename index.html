@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <!-- โหลดไลบรารี html5-qrcode จาก CDN -->
+    <script src="https://unpkg.com" type="text/javascript"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f5f7fb;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        h2 { color: #333; margin-bottom: 20px; font-size: 1.2rem; }
+        #reader { width: 100%; border: none !important; }
+        /* ตกแต่งปุ่มภายในตัวสแกนให้ดูสวยงามขึ้น */
+        #reader button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 id="scanner-title">กำลังโหลดเครื่องสแกน...</h2>
+    <div id="reader"></div>
+</div>
+
+<script>
+    // 1. ตรวจสอบว่าเปิดมาเพื่อสแกนช่องไหน (asset_id หรือ component_code)
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetField = urlParams.get('target') || 'asset_id';
+    
+    // เปลี่ยนหัวข้อตามช่องที่กดมา
+    const titleEl = document.getElementById('scanner-title');
+    if(targetField === 'asset_id') titleEl.innerText = 'สแกนรหัส ASSET ID';
+    if(targetField === 'component_code') titleEl.innerText = 'สแกนรหัส COMPONENT CODE';
+
+    // ** สำคัญมาก: ใส่ URL ของหน้า Google Web App ของคุณที่นี่ **
+    const GOOGLE_WEB_APP_URL = "https://chokbunthit.github.io/CMMS-Smart-Service/"; 
+
+    // 2. ฟังก์ชันเมื่อสแกนสำเร็จ
+    function onScanSuccess(decodedText, decodedResult) {
+        // หยุดการทำงานของกล้องทันทีเพื่อเคลียร์ memory
+        html5QrcodeScanner.clear().then(() => {
+            // ยิง URL ส่งค่ากลับไปที่ Google Web App พร้อม parameter
+            window.location.href = `${GOOGLE_WEB_APP_URL}?action=autofill&field=${targetField}&value=${encodeURIComponent(decodedText)}`;
+        }).catch(error => {
+            console.error("Failed to clear scanner", error);
+            // เผื่อเคลียร์กล้องไม่ผ่าน แต่ให้ย้ายหน้าจอกลับทันที
+            window.location.href = `${GOOGLE_WEB_APP_URL}?action=autofill&field=${targetField}&value=${encodeURIComponent(decodedText)}`;
+        });
+    }
+
+    // 3. เริ่มต้นเปิดเครื่องสแกน
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", 
+        { 
+            fps: 10, 
+            qrbox: { width: 250, height: 250 },
+            rememberLastUsedCamera: true
+        }, 
+        /* verbose= */ false
+    );
+    html5QrcodeScanner.render(onScanSuccess);
+</script>
+
+</body>
+</html>
