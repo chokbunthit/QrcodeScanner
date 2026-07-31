@@ -81,10 +81,15 @@
         { 
             fps: 10, 
             qrbox: { width: 250, height: 250 },
-            rememberLastUsedCamera: true
+            rememberLastUsedCamera: true, // จำกล้องที่เลือกใช้ล่าสุด
+            // บังคับการดึงค่ากล้องเริ่มต้นให้เจาะจงไปที่กล้องหลังคู่ตัวเครื่อง
+            videoConstraints: {
+                facingMode: { exact: "environment" } 
+            }
         }, 
         /* verbose= */ false
     );
+
     html5QrcodeScanner.render(onScanSuccess);
 </script>
 
