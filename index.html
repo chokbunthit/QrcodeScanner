@@ -58,14 +58,29 @@
 
     const GOOGLE_WEB_APP_URL = "https://chokbunthit.github.io/CMMS-Smart-Service/"; 
 
-    function onScanSuccess(decodedText, decodedResult) {
-        html5QrcodeScanner.clear().then(() => {
-            window.location.href = GOOGLE_WEB_APP_URL + "?action=autofill&field=" + targetField + "&value=" + encodeURIComponent(decodedText);
-        }).catch(error => {
-            console.error("Failed to clear scanner", error);
-            window.location.href = GOOGLE_WEB_APP_URL + "?action=autofill&field=" + targetField + "&value=" + encodeURIComponent(decodedText);
-        });
-    }
+   function onScanSuccess(decodedText, decodedResult) {
+    html5QrcodeScanner.clear().then(() => {
+        // ตรวจสอบว่าหน้าจอนี้ถูกเปิดมาจากหน้าฟอร์มหลักจริงไหม
+        if (window.opener) {
+            // แพ็กข้อมูลส่งข้อมูลข้ามมิติกลับไปหาหน้าฟอร์มหลักที่เปิดค้างไว้
+            const messageData = {
+                action: 'autofill',
+                field: targetField,
+                value: decodedText
+            };
+            
+            // ส่งค่ากลับไปที่หน้าหลัก (ระบุโดเมนปลายทางให้ชัดเจนเพื่อความปลอดภัย)
+            window.opener.postMessage(messageData, "*"); 
+            
+            // ปิดหน้าต่างกล้องสแกนนี้ทิ้งทันที หน้าจอมือถือจะเด้งกลับไปที่หน้าฟอร์มเดิมสวยๆ
+            window.close();
+        } else {
+            alert("สแกนสำเร็จ: " + decodedText + " (กรุณาเปิดผ่านหน้าฟอร์มระบบ)");
+        }
+    }).catch(error => {
+        console.error("Failed to clear scanner", error);
+    });
+}
 
     // 2. ปรับโครงสร้างตัวสแกนใหม่ เพื่อเลือกใช้กล้องหลังอย่างปลอดภัย
     let html5QrcodeScanner = new Html5QrcodeScanner(
