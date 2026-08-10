@@ -1,104 +1,1232 @@
+```html
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner</title>
-    <!-- 1. แก้ไขลิงก์ CDN ให้ดึงสคริปต์ html5-qrcode มาให้ถูกต้อง -->
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <meta name="viewport"
+          content="width=device-width,
+                   initial-scale=1.0,
+                   maximum-scale=1.0,
+                   user-scalable=no">
+
+    <title>CMMS QR Scanner</title>
+
+
+    <!--
+        QR Scanner Library
+    -->
+    <script src="https://unpkg.com/html5-qrcode"
+            type="text/javascript">
+    </script>
+
+
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #f5f7fb;
+
             margin: 0;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-        }
-        h2 { color: #333; margin-bottom: 20px; font-size: 1.2rem; }
-        #reader { width: 100%; border: none !important; }
-        #reader button {
-            background-color: #2563eb;
+
+            min-height: 100vh;
+
+            background: #0f172a;
+
             color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            margin: 10px 0;
+
+            font-family:
+                Arial,
+                sans-serif;
+
+            display: flex;
+
+            flex-direction: column;
+
         }
+
+
+        /* =================================================
+           HEADER
+        ================================================= */
+
+        .header {
+
+            height: 60px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding:
+                0 16px;
+
+            background:
+                #111827;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.08);
+
+        }
+
+
+        .title {
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+        }
+
+
+        .target {
+
+            font-size: 11px;
+
+            color: #94a3b8;
+
+            margin-top: 2px;
+
+        }
+
+
+        .close-btn {
+
+            border: 0;
+
+            background:
+                rgba(255,255,255,.08);
+
+            color: white;
+
+            width: 36px;
+
+            height: 36px;
+
+            border-radius: 10px;
+
+            font-size: 18px;
+
+            cursor: pointer;
+
+        }
+
+
+        /* =================================================
+           CAMERA
+        ================================================= */
+
+        .scanner-container {
+
+            flex: 1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 16px;
+
+        }
+
+
+        .scanner-box {
+
+            width: 100%;
+
+            max-width: 480px;
+
+        }
+
+
+        #reader {
+
+            width: 100%;
+
+            border-radius: 18px;
+
+            overflow: hidden;
+
+            background: black;
+
+        }
+
+
+        /*
+         * html5-qrcode จะสร้าง UI บางส่วนเอง
+         */
+
+        #reader video {
+
+            width: 100% !important;
+
+            height: auto !important;
+
+            object-fit: cover;
+
+        }
+
+
+        /* =================================================
+           SCAN FRAME
+        ================================================= */
+
+        .scan-guide {
+
+            margin-top: 18px;
+
+            text-align: center;
+
+        }
+
+
+        .scan-guide-title {
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+        }
+
+
+        .scan-guide-text {
+
+            font-size: 11px;
+
+            color: #94a3b8;
+
+            margin-top: 6px;
+
+            line-height: 1.5;
+
+        }
+
+
+        /* =================================================
+           ERROR
+        ================================================= */
+
+        .error-box {
+
+            display: none;
+
+            margin-top: 18px;
+
+            padding: 14px;
+
+            border-radius: 14px;
+
+            background:
+                rgba(239,68,68,.12);
+
+            border:
+                1px solid
+                rgba(239,68,68,.25);
+
+            text-align: center;
+
+        }
+
+
+        .error-title {
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            color: #fca5a5;
+
+        }
+
+
+        .error-text {
+
+            font-size: 11px;
+
+            color: #cbd5e1;
+
+            margin-top: 6px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .browser-btn {
+
+            display: none;
+
+            margin-top: 12px;
+
+            width: 100%;
+
+            border: 0;
+
+            padding: 11px;
+
+            border-radius: 10px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+        }
+
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
+
+        .success-box {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                rgba(15,23,42,.96);
+
+            z-index: 100;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 24px;
+
+        }
+
+
+        .success-card {
+
+            width: 100%;
+
+            max-width: 360px;
+
+            background: white;
+
+            color: #0f172a;
+
+            border-radius: 20px;
+
+            padding: 28px;
+
+            text-align: center;
+
+        }
+
+
+        .success-icon {
+
+            width: 60px;
+
+            height: 60px;
+
+            margin: auto;
+
+            border-radius: 50%;
+
+            background: #dcfce7;
+
+            color: #16a34a;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 26px;
+
+        }
+
+
+        .success-title {
+
+            font-size: 17px;
+
+            font-weight: 800;
+
+            margin-top: 14px;
+
+        }
+
+
+        .success-value {
+
+            margin-top: 8px;
+
+            padding: 10px;
+
+            background: #f1f5f9;
+
+            border-radius: 10px;
+
+            font-family: monospace;
+
+            font-size: 13px;
+
+            word-break: break-all;
+
+        }
+
     </style>
+
 </head>
+
+
 <body>
 
-<div class="container">
-    <h2 id="scanner-title">กำลังโหลดเครื่องสแกน...</h2>
-    <div id="reader"></div>
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
+<header class="header">
+
+    <div>
+
+        <div class="title">
+
+            <span>📷</span>
+
+            QR Scanner
+
+        </div>
+
+        <div id="targetLabel"
+             class="target">
+
+            -
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="close-btn"
+        onclick="closeScanner()">
+
+        ×
+
+    </button>
+
+</header>
+
+
+
+<!-- =====================================================
+     CAMERA
+====================================================== -->
+
+<main class="scanner-container">
+
+    <div class="scanner-box">
+
+
+        <div id="reader"></div>
+
+
+        <div class="scan-guide">
+
+            <div class="scan-guide-title">
+
+                สแกน QR Code
+
+            </div>
+
+            <div class="scan-guide-text">
+
+                วาง QR Code ให้อยู่ภายในกรอบ
+                <br>
+                ระบบจะอ่านข้อมูลโดยอัตโนมัติ
+
+            </div>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div id="errorBox"
+             class="error-box">
+
+            <div class="error-title">
+
+                ไม่สามารถเปิดกล้องได้
+
+            </div>
+
+            <div id="errorText"
+                 class="error-text">
+
+                -
+
+            </div>
+
+
+            <button
+                id="browserBtn"
+                class="browser-btn"
+                onclick="openExternalBrowser()">
+
+                🌐 เปิดด้วย Browser
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+</main>
+
+
+
+<!-- =====================================================
+     SUCCESS
+====================================================== -->
+
+<div id="successBox"
+     class="success-box">
+
+    <div class="success-card">
+
+        <div class="success-icon">
+
+            ✓
+
+        </div>
+
+
+        <div class="success-title">
+
+            อ่าน QR สำเร็จ
+
+        </div>
+
+
+        <div id="successValue"
+             class="success-value">
+
+            -
+
+        </div>
+
+    </div>
+
 </div>
 
+
+
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetField = urlParams.get('target') || 'asset_id';
-    
-    const titleEl = document.getElementById('scanner-title');
-    if(targetField === 'asset_id') titleEl.innerText = 'สแกนรหัส ASSET ID';
-    if(targetField === 'component_code') titleEl.innerText = 'สแกนรหัส COMPONENT CODE';
 
-    const GOOGLE_WEB_APP_URL = "https://chokbunthit.github.io/CMMS-Smart-Service/"; 
+    // ====================================================
+    // GLOBAL
+    // ====================================================
 
-  function onScanSuccess(decodedText, decodedResult) {
-    html5QrcodeScanner.clear().then(() => {
-        // ตรวจสอบว่าหน้าจอนี้ถูกเปิดมาจากหน้าฟอร์มหลักจริงไหม
-        if (window.opener) {
-            // แพ็กข้อมูลส่งข้อมูลข้ามมิติกลับไปหาหน้าฟอร์มหลักที่เปิดค้างไว้
-            const messageData = {
-                action: 'autofill',
-                field: targetField,
-                value: decodedText
-            };
-            
-            // ส่งค่ากลับไปที่หน้าหลัก (ระบุโดเมนปลายทางให้ชัดเจนเพื่อความปลอดภัย)
-            window.opener.postMessage(messageData, "*"); 
-            
-            // ปิดหน้าต่างกล้องสแกนนี้ทิ้งทันที หน้าจอมือถือจะเด้งกลับไปที่หน้าฟอร์มเดิมสวยๆ
-            window.close();
-        } else {
-            alert("สแกนสำเร็จ: " + decodedText + " (กรุณาเปิดผ่านหน้าฟอร์มระบบ)");
-        }
-    }).catch(error => {
-        console.error("Failed to clear scanner", error);
-    });
-}
+    let scanner = null;
 
-    // 2. ปรับโครงสร้างตัวสแกนใหม่ เพื่อเลือกใช้กล้องหลังอย่างปลอดภัย
-    let html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", 
-        { 
-            fps: 15, // เพิ่มความเร็วในการประมวลผลภาพให้จับภาพคิวอาร์โค้ดได้ง่ายขึ้น
-            qrbox: { width: 250, height: 250 },
-            rememberLastUsedCamera: true,
-            // เรียกใช้กล้องหลังโดยไม่ใช้คำสั่ง exact ป้องกันปัญหากล้องค้างบนบางอุปกรณ์
-            videoConstraints: {
-                facingMode: "environment"
+    let scannerStarted = false;
+
+    let scanTarget = "reqAsset";
+
+
+    // ====================================================
+    // GET QUERY
+    // ====================================================
+
+    function getQueryParams() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        return {
+
+            target:
+                params.get("target")
+                || "reqAsset",
+
+            returnUrl:
+                params.get("returnUrl")
+                || ""
+
+        };
+
+    }
+
+
+    // ====================================================
+    // LINE DETECTION
+    // ====================================================
+
+    function isLineBrowser() {
+
+        const ua =
+            navigator.userAgent ||
+            navigator.vendor ||
+            window.opera ||
+            "";
+
+
+        return /Line\/[\d.]+/i.test(
+            ua
+        );
+
+    }
+
+
+    // ====================================================
+    // START
+    // ====================================================
+
+    async function startScanner() {
+
+        const params =
+            getQueryParams();
+
+
+        scanTarget =
+            params.target;
+
+
+        document
+            .getElementById(
+                "targetLabel"
+            )
+            .textContent =
+                "Target: " +
+                scanTarget;
+
+
+        try {
+
+            /*
+             * ตรวจว่า Browser รองรับ Camera
+             */
+
+            if (
+                !navigator.mediaDevices ||
+                !navigator.mediaDevices.getUserMedia
+            ) {
+
+                throw new Error(
+                    "Browser นี้ไม่รองรับการใช้งานกล้อง"
+                );
+
             }
-        }, 
-        /* verbose= */ false
+
+
+            /*
+             * ขอ Camera permission ก่อน
+             *
+             * สำคัญ:
+             * เรียกจากหน้า Scanner โดยตรง
+             */
+
+            const stream =
+                await navigator
+                    .mediaDevices
+                    .getUserMedia({
+
+                        video: {
+                            facingMode: {
+                                ideal:
+                                    "environment"
+                            }
+                        },
+
+                        audio: false
+
+                    });
+
+
+            /*
+             * ปิด stream ทดสอบ
+             */
+
+            stream
+                .getTracks()
+                .forEach(
+                    track =>
+                        track.stop()
+                );
+
+
+            /*
+             * เริ่ม QR Scanner
+             */
+
+            scanner =
+                new Html5Qrcode(
+                    "reader"
+                );
+
+
+            await scanner.start(
+
+                {
+                    facingMode:
+                        "environment"
+                },
+
+                {
+                    fps: 10,
+
+                    qrbox: function(
+                        width,
+                        height
+                    ) {
+
+                        const size =
+                            Math.min(
+                                width,
+                                height
+                            ) * 0.70;
+
+
+                        return {
+                            width:
+                                size,
+
+                            height:
+                                size
+                        };
+
+                    },
+
+                    aspectRatio:
+                        1.0
+
+                },
+
+                function(
+                    decodedText
+                ) {
+
+                    handleQRCode(
+                        decodedText
+                    );
+
+                },
+
+                function(
+                    errorMessage
+                ) {
+
+                    /*
+                     * ไม่ต้องแสดง error ทุก frame
+                     */
+
+                }
+
+            );
+
+
+            scannerStarted =
+                true;
+
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Camera error:",
+                error
+            );
+
+
+            showCameraError(
+                error
+            );
+
+        }
+
+    }
+
+
+
+    // ====================================================
+    // QR SUCCESS
+    // ====================================================
+
+    async function handleQRCode(
+        value
+    ) {
+
+        if (!value) {
+            return;
+        }
+
+
+        /*
+         * ป้องกัน Scan ซ้ำ
+         */
+
+        if (!scannerStarted) {
+            return;
+        }
+
+
+        scannerStarted =
+            false;
+
+
+        try {
+
+            if (scanner) {
+
+                await scanner.stop();
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.warn(
+                "Scanner stop:",
+                error
+            );
+
+        }
+
+
+        document
+            .getElementById(
+                "successValue"
+            )
+            .textContent =
+                value;
+
+
+        document
+            .getElementById(
+                "successBox"
+            )
+            .style.display =
+                "flex";
+
+
+        /*
+         * ส่งค่ากลับ
+         */
+
+        setTimeout(
+            function() {
+
+                returnValue(
+                    value
+                );
+
+            },
+            500
+        );
+
+    }
+
+
+
+    // ====================================================
+    // RETURN VALUE
+    // ====================================================
+
+    function returnValue(
+        value
+    ) {
+
+        const params =
+            getQueryParams();
+
+
+        /*
+         * ==================================================
+         * กรณี Scanner ถูกเปิดใน iframe / opener
+         * ==================================================
+         */
+
+        if (
+            window.opener &&
+            !window.opener.closed
+        ) {
+
+            try {
+
+                window.opener.postMessage(
+
+                    {
+
+                        action:
+                            "autofill",
+
+                        field:
+                            scanTarget,
+
+                        value:
+                            value
+
+                    },
+
+                    "*"
+
+                );
+
+
+                window.close();
+
+                return;
+
+            }
+
+            catch (error) {
+
+                console.warn(
+                    "opener:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /*
+         * ==================================================
+         * กรณีเปิดแบบ location.href
+         *
+         * ใช้ history.back()
+         *
+         * แล้วส่งผ่าน sessionStorage
+         * ==================================================
+         */
+
+        sessionStorage.setItem(
+
+            "cmms_qr_result",
+
+            JSON.stringify({
+
+                field:
+                    scanTarget,
+
+                value:
+                    value
+
+            })
+
+        );
+
+
+        /*
+         * ถ้ามี history
+         */
+
+        if (
+            window.history.length > 1
+        ) {
+
+            window.history.back();
+
+            return;
+
+        }
+
+
+        /*
+         * fallback
+         */
+
+        if (
+            params.returnUrl
+        ) {
+
+            window.location.href =
+                params.returnUrl;
+
+        }
+
+    }
+
+
+
+    // ====================================================
+    // CAMERA ERROR
+    // ====================================================
+
+    function showCameraError(
+        error
+    ) {
+
+        const errorBox =
+            document.getElementById(
+                "errorBox"
+            );
+
+
+        const errorText =
+            document.getElementById(
+                "errorText"
+            );
+
+
+        errorBox.style.display =
+            "block";
+
+
+        let message =
+            "ไม่สามารถเปิดกล้องได้";
+
+
+        if (
+            error &&
+            error.name ===
+            "NotAllowedError"
+        ) {
+
+            message =
+                "ไม่ได้รับอนุญาตให้ใช้กล้อง " +
+                "กรุณาอนุญาต Camera ใน Browser";
+
+        }
+
+
+        else if (
+            error &&
+            error.name ===
+            "NotFoundError"
+        ) {
+
+            message =
+                "ไม่พบกล้องในอุปกรณ์นี้";
+
+        }
+
+
+        else if (
+            error &&
+            error.name ===
+            "NotReadableError"
+        ) {
+
+            message =
+                "กล้องกำลังถูกใช้งานโดย Application อื่น";
+
+        }
+
+
+        else if (
+            error &&
+            error.message
+        ) {
+
+            message =
+                error.message;
+
+        }
+
+
+        errorText.textContent =
+            message;
+
+
+        /*
+         * ถ้าอยู่ใน LINE
+         *
+         * แสดงปุ่ม Browser
+         */
+
+        if (
+            isLineBrowser()
+        ) {
+
+            document
+                .getElementById(
+                    "browserBtn"
+                )
+                .style.display =
+                    "block";
+
+        }
+
+    }
+
+
+
+    // ====================================================
+    // OPEN EXTERNAL BROWSER
+    // ====================================================
+
+    function openExternalBrowser() {
+
+        /*
+         * LINE รองรับ scheme
+         * เพื่อพยายามเปิด URL
+         * ใน external browser
+         *
+         * Android:
+         * intent://
+         *
+         * iOS:
+         * ใช้ปุ่มของ LINE
+         * "Open in Browser"
+         */
+
+        const currentUrl =
+            window.location.href;
+
+
+        /*
+         * สำหรับ Android
+         */
+
+        const androidIntent =
+            "intent://" +
+            currentUrl.replace(
+                /^https?:\/\//,
+                ""
+            ) +
+            "#Intent;" +
+            "scheme=https;" +
+            "package=com.android.chrome;" +
+            "end";
+
+
+        if (
+            /Android/i.test(
+                navigator.userAgent
+            )
+        ) {
+
+            window.location.href =
+                androidIntent;
+
+            return;
+
+        }
+
+
+        /*
+         * iPhone / iPad
+         *
+         * เปิด URL เดิม
+         * แล้วให้ผู้ใช้เลือก
+         * Open in Browser จาก LINE
+         */
+
+        alert(
+            "กรุณากดเมนู ⋯ ของ LINE " +
+            "แล้วเลือก \"เปิดในเบราว์เซอร์\""
+        );
+
+    }
+
+
+
+    // ====================================================
+    // CLOSE
+    // ====================================================
+
+    function closeScanner() {
+
+        try {
+
+            if (scanner) {
+
+                scanner.stop()
+                    .catch(
+                        function() {}
+                    );
+
+            }
+
+        }
+
+        catch (error) {}
+
+
+        /*
+         * ถ้าเป็น popup
+         */
+
+        if (
+            window.opener
+        ) {
+
+            window.close();
+
+            return;
+
+        }
+
+
+        /*
+         * ถ้าเป็นหน้าเดียว
+         */
+
+        window.history.back();
+
+    }
+
+
+
+    // ====================================================
+    // RECEIVE RESULT AFTER BACK
+    // ====================================================
+
+    window.addEventListener(
+        "pageshow",
+        function() {
+
+            /*
+             * Scanner page ไม่ต้องทำอะไร
+             *
+             * หน้าหลัก Request Repair
+             * จะเป็นคนอ่าน sessionStorage
+             */
+
+        }
     );
 
-    html5QrcodeScanner.render(onScanSuccess);
+
+
+    // ====================================================
+    // INIT
+    // ====================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            startScanner();
+
+        }
+    );
+
 </script>
 
 </body>
+
 </html>
+```
